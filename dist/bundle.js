@@ -74,13 +74,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //console.log("tyo")
 
 var Generator = /** @class */ (function () {
+    // console.log("hello");
     function Generator() {
         var _this = this;
         this.studentData = [];
         var button = document.getElementById("add");
         var sortButton = document.getElementById("sort");
-        button.addEventListener("click", function (e) { return _this.addData(); });
-        sortButton.addEventListener("click", function (e) { return _this.sortByMark(); });
+        button.addEventListener("click", function () { return _this.addData(); });
+        sortButton.addEventListener("click", function () { return _this.sortByMark(); });
     }
     ;
     Generator.prototype.addData = function () {
@@ -90,6 +91,7 @@ var Generator = /** @class */ (function () {
         if (name != "") {
             var studentObj = new __WEBPACK_IMPORTED_MODULE_0__student_model__["a" /* StudentModel */](itemId, name, mark);
             this.studentData.push(studentObj);
+            localStorage.setItem("StudentDB", JSON.stringify(this.studentData));
             console.log(this.studentData);
             this.renderData();
         }
@@ -98,6 +100,10 @@ var Generator = /** @class */ (function () {
         var _this = this;
         document.getElementById("main").innerHTML = "";
         this.clearForm();
+        if (JSON.parse(localStorage.getItem("StudentDB"))) {
+            this.studentData = JSON.parse(localStorage.getItem("StudentDB"));
+        }
+        console.log("localDB", this.studentData);
         for (var i = 0; i < this.studentData.length; i++) {
             var list = document.createElement("tr");
             list.innerHTML = '<td class="padding-16"><b>' + this.studentData[i].Name + '</b></td><td class="padding-16"><b>' + this.studentData[i].Marks + '</b></td>';
@@ -115,6 +121,28 @@ var Generator = /** @class */ (function () {
         }
         this.showHide();
     };
+    Generator.prototype.deleteData = function (e) {
+        var removeIndex = this.studentData.map(function (item) { return item.ItemId; }).indexOf(e.srcElement.id);
+        this.studentData.splice(removeIndex, 1);
+        localStorage.setItem("StudentDB", JSON.stringify(this.studentData));
+        this.renderData();
+    };
+    Generator.prototype.sortByMark = function () {
+        if (Generator.clickState == 0) {
+            this.studentData.sort(function (a, b) {
+                return b.Marks - a.Marks;
+            });
+            Generator.clickState = 1;
+        }
+        else {
+            this.studentData.sort(function (a, b) {
+                return a.Marks - b.Marks;
+            });
+            Generator.clickState = 0;
+        }
+        localStorage.setItem("StudentDB", JSON.stringify(this.studentData));
+        this.renderData();
+    };
     Generator.prototype.showHide = function () {
         var table = document.getElementById("main-table");
         var noData = document.getElementById("no-data");
@@ -127,11 +155,6 @@ var Generator = /** @class */ (function () {
             noData.style.display = "none";
         }
     };
-    Generator.prototype.deleteData = function (e) {
-        var removeIndex = this.studentData.map(function (item) { return item.ItemId; }).indexOf(e.srcElement.id);
-        this.studentData.splice(removeIndex, 1);
-        this.renderData();
-    };
     Generator.prototype.guid = function () {
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
@@ -140,23 +163,6 @@ var Generator = /** @class */ (function () {
         }
         return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
             s4() + '-' + s4() + s4() + s4();
-    };
-    Generator.prototype.sortByMark = function () {
-        if (Generator.clickState == 0) {
-            this.studentData.sort(function (a, b) {
-                return b.Marks - a.Marks;
-            });
-            console.log("1");
-            Generator.clickState = 1;
-        }
-        else {
-            this.studentData.sort(function (a, b) {
-                return a.Marks - b.Marks;
-            });
-            console.log("2");
-            Generator.clickState = 0;
-        }
-        this.renderData();
     };
     Generator.prototype.clearForm = function () {
         document.getElementById("name").value = "";
